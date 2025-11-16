@@ -26,10 +26,16 @@ app.post("/vision", async (req, res) => {
         }
 
         const question =
-            prompt || "Describe what is happening in this image.";
+            prompt ||
+            "You are looking at a photo of a multiple-choice question on a screen. " +
+            "First, read the question text and the answer choices. " +
+            "Then decide which choice is most likely correct. " +
+            "Respond with ONLY the single capital letter of the best answer " +
+            "(A, B, C, D, or E). Do not write any explanation or extra words.";
 
         const body = {
             model: "gpt-4.1-mini",
+            temperature: 0,
             input: [
                 {
                     role: "user",
@@ -39,14 +45,16 @@ app.post("/vision", async (req, res) => {
                             text: question
                         },
                         {
-                            // 👇 THIS IS THE CORRECT FORMAT
                             type: "input_image",
-                            image_url: `data:image/jpeg;base64,${image_base64}`
+                            image_url: {
+                                url: `data:image/jpeg;base64,${image_base64}`
+                            }
                         }
                     ]
                 }
             ]
         };
+
 
         const openaiRes = await fetch("https://api.openai.com/v1/responses", {
             method: "POST",
