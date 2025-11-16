@@ -36,17 +36,20 @@ app.post("/vision", async (req, res) => {
                     content: [
                         {
                             type: "input_text",
-                            text: question
+                            text:
+                                question ||
+                                "Look at the image and answer ONLY with one letter: A, B, C, or D."
                         },
                         {
-                            type: "input_image",
-                            image_url: {
-                                url: `data:image/jpeg;base64,${image_base64}`
-                            }
+                            // ✅ correct type for vision in Responses API
+                            type: "input_image_url",
+                            // ✅ image_url must be a STRING, not { url: ... }
+                            image_url: `data:image/jpeg;base64,${image_base64}`
                         }
                     ]
                 }
-            ]
+            ],
+            max_output_tokens: 5
         };
 
         const openaiRes = await fetch("https://api.openai.com/v1/responses", {
