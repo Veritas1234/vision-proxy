@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const fetch = require("node-fetch");   // ⬅️ add this line
+const fetch = require("node-fetch");
 
 const app = express();
 app.use(cors());
@@ -36,20 +36,16 @@ app.post("/vision", async (req, res) => {
                     content: [
                         {
                             type: "input_text",
-                            text:
-                                question ||
-                                "Look at the image and answer ONLY with one letter: A, B, C, or D."
+                            text: question
                         },
                         {
-                            // ✅ correct type for vision in Responses API
-                            type: "input_image_url",
-                            // ✅ image_url must be a STRING, not { url: ... }
+                            // 👇 THIS IS THE CORRECT FORMAT
+                            type: "input_image",
                             image_url: `data:image/jpeg;base64,${image_base64}`
                         }
                     ]
                 }
-            ],
-            max_output_tokens: 5
+            ]
         };
 
         const openaiRes = await fetch("https://api.openai.com/v1/responses", {
@@ -74,6 +70,7 @@ app.post("/vision", async (req, res) => {
         // try extracting the text
         let answerText = "";
         try {
+            // responses API: output -> [ { content: [ { type: "output_text", text: "..." } ] } ]
             answerText = data.output[0].content[0].text;
         } catch (e) {
             console.error("Bad OpenAI response:", data);
